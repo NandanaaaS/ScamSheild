@@ -1,0 +1,12 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@theme {
+  --scamshield-bg: rgb(34, 40, 49);
+  --scamshield-dark: rgb(57, 62, 70);
+  --scamshield-accent: rgb(0, 173, 181);
+  --scamshield-light: rgb(238, 238, 238);
+}
+body{
+  background-color: var(--scamshield-bg);
+  font-family: 'Geist Mono', monospace;
+}
