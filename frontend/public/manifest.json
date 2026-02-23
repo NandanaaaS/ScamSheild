@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "ScamShield",
+  "version": "1.0",
+  "description": "AI scam detector",
+  "permissions": ["contextMenus", "storage", "activeTab"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html"
+  }
+}
