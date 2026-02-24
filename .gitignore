@@ -1,56 +1,37 @@
-# =========================
-# Virtual Environment
-# =========================
+# Virtual environment
 venv/
 env/
 .venv/
 
-# =========================
-# Python Cache
-# =========================
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# =========================
-# Model Checkpoints
-# =========================
+# Model checkpoints
 models/checkpoints/
 *.pt
 
-# =========================
-# Data (Large Files)
-# =========================
+# Data
 data/raw/
 data/processed/
 *.csv
 
-# =========================
-# HuggingFace Cache
-# =========================
+# HuggingFace cache
 .cache/
 huggingface/
-hf_cache/
 
-# =========================
-# Jupyter
-# =========================
-.ipynb_checkpoints/
-
-# =========================
-# IDE / Editor
-# =========================
+# IDE
 .vscode/
 .idea/
 
-# =========================
-# OS Junk
-# =========================
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
 .DS_Store
 Thumbs.db
 
-# =========================
 # Logs
-# =========================
 *.log
