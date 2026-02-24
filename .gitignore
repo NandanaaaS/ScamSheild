@@ -1,28 +1,56 @@
-# Python
+# =========================
+# Virtual Environment
+# =========================
+venv/
+env/
+.venv/
+
+# =========================
+# Python Cache
+# =========================
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Virtual environments
-venv/
-.venv/
-env/
+# =========================
+# Model Checkpoints
+# =========================
+models/checkpoints/
+*.pt
 
-# Environment variables
-.env
+# =========================
+# Data (Large Files)
+# =========================
+data/raw/
+data/processed/
+*.csv
 
-# Data (do not commit datasets)
-data/raw/*
-data/processed/*
+# =========================
+# HuggingFace Cache
+# =========================
+.cache/
+huggingface/
+hf_cache/
 
-# Model checkpoints
-models/checkpoints/*
-
-# Notebooks
+# =========================
+# Jupyter
+# =========================
 .ipynb_checkpoints/
 
-# Experiment tracking
-wandb/
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
 
-# OS
+# =========================
+# OS Junk
+# =========================
 .DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+*.log
