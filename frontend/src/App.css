@@ -1,12 +1,41 @@
-@import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-@theme {
-  --scamshield-bg: rgb(34, 40, 49);
-  --scamshield-dark: rgb(57, 62, 70);
-  --scamshield-accent: rgb(0, 173, 181);
-  --scamshield-light: rgb(238, 238, 238);
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
 }
-body{
-  background-color: var(--scamshield-bg);
-  font-family: 'Geist Mono', monospace;
+
+.container {
+  width: 320px;
+  height: 200px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+h2 {
+  margin: 0;
+}
+
+.result-card {
+  width: 100%;
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  transition: 0.3s ease;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.scam {
+  background: #ffe5e5;
+  color: #b30000;
+}
+
+.legit {
+  background: #e6ffe6;
+  color: #006600;
 }
