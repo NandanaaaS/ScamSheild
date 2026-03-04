@@ -7,3 +7,6 @@ matplotlib
 lime
 fastapi
 uvicorn
+python-multipart
+pyzbar
+pillow
