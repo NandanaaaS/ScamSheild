@@ -4,7 +4,8 @@ import "./App.css";
 function App() {
   const [result, setResult] = useState("Analyzing...");
   const [isScam, setIsScam] = useState(null);
-
+  const [explanation, setExplanation] = useState([]);
+  
   async function analyzeText(text) {
     try {
       const response = await fetch("http://127.0.0.1:8000/predict", {
@@ -24,6 +25,7 @@ function App() {
           2
         )}%)`
       );
+      setExplanation(data.explanation || []);
     } catch (error) {
       setResult("Error connecting to backend");
     }
@@ -46,7 +48,17 @@ function App() {
       <div className={`result-card ${isScam ? "scam" : "legit"}`}>
         {result}
       </div>
-    </div>
+       {explanation.length > 0 && (
+      <div className="explanation">
+        <strong>Key indicators:</strong>
+        <ul>
+          {explanation.map((word, index) => (
+            <li key={index}>{word}</li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
   );
 }
 
