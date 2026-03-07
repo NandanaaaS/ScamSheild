@@ -1,9 +1,16 @@
 from lime.lime_text import LimeTextExplainer
+import logging
+logging.basicConfig(level=logging.INFO)
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import shutil
+import os
+import re
+import requests
+from dotenv import load_dotenv
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 import os
 
 # Import the ML inference function
@@ -35,9 +42,16 @@ class PredictRequest(BaseModel):
 
 
 class PredictResponse(BaseModel):
-    prediction: str
-    confidence: float
-    explanation: list[str]
+    prediction: Optional[str] = None
+    confidence: Optional[float] = None
+    explanation: Optional[list[str]] = None
+    url_risks: Optional[list[str]] = None
+
+class URLCheckRequest(BaseModel):
+    url: str
+
+class URLCheckResponse(BaseModel):
+    risks: list[str]
 
 
 # ------------------------
@@ -69,30 +83,74 @@ async def predict_text(request: PredictRequest):
 
 @app.post("/predict-qr", response_model=PredictResponse)
 async def predict_qr(file: UploadFile = File(...)):
+    import logging
+    def google_safe_browsing_check(url):
+        api_key = os.getenv("GOOGLE_SAFE_BROWSING_API_KEY")
+        endpoint = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={api_key}"
+        payload = {
+            "client": {"clientId": "scamshield", "clientVersion": "1.0"},
+            "threatInfo": {
+                "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],
+                "platformTypes": ["ANY_PLATFORM"],
+                "threatEntryTypes": ["URL"],
+                "threatEntries": [{"url": url}]
+            }
+        }
+        logging.info(f"Calling Google Safe Browsing API for URL: {url}")
+        try:
+            resp = requests.post(endpoint, json=payload, timeout=5)
+            logging.info(f"Google Safe Browsing response status: {resp.status_code}")
+            logging.info(f"Google Safe Browsing response body: {resp.text}")
+            resp.raise_for_status()
+            data = resp.json()
+            if "matches" in data:
+                return "Unsafe: Threat detected by Google Safe Browsing"
+            else:
+                return "Safe: No threats found by Google Safe Browsing"
+        except Exception as e:
+            logging.error(f"Safe Browsing check error: {str(e)}")
+            return f"Safe Browsing check error: {str(e)}"
+
+    # ------------------------
+    # URL CHECK ENDPOINT
+    # ------------------------
+
+    @app.post("/url-check", response_model=URLCheckResponse)
+    async def url_check(request: URLCheckRequest):
+        url = request.url
+        risks = []
+        verdict = google_safe_browsing_check(url)
+        risks.append(verdict)
+        return URLCheckResponse(risks=risks)
 
     try:
         temp_path = "temp_qr.png"
-
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-
         image = Image.open(temp_path)
         decoded_objects = decode(image)
-
         if not decoded_objects:
             raise HTTPException(status_code=400, detail="No QR code found")
-
         extracted_text = decoded_objects[0].data.decode("utf-8")
-
-        result = predict(extracted_text)
-
+        prediction = None
+        confidence = None
+        explanation = []
+        url_risks = []
+        if re.match(r"https?://", extracted_text):
+            # Only run Google Safe Browsing check for URLs
+            url_risks = [google_safe_browsing_check(extracted_text)]
+        else:
+            # Only run ML prediction for plain text
+            result = predict(extracted_text)
+            prediction = result["prediction"]
+            confidence = result["confidence"]
+            explanation = result["explanation"]
         os.remove(temp_path)
-
         return PredictResponse(
-            prediction=result["prediction"],
-            confidence=result["confidence"],
-            explanation=result["explanation"]
+            prediction=prediction,
+            confidence=confidence,
+            explanation=explanation,
+            url_risks=url_risks
         )
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
