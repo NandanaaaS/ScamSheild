@@ -1,54 +1,206 @@
+:root {
+  --accent-scam: #ff3b30;
+  --accent-safe: #34c759;
+  --bg-card: #ffffff;
+  --text-main: #1d1d1f;
+  --text-muted: #86868b;
+  --border-color: #e5e5e7;
+}
+
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: transparent;
 }
 
+/* Container with subtle background shift */
 .container {
-  width: 320px;
-  height: 200px;
-  padding: 15px;
+  width: 100%;
+  min-width: 350px;
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+  transition: background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.container.scam-bg { background: rgba(255, 59, 48, 0.05); }
+.container.safe-bg { background: rgba(52, 199, 89, 0.05); }
+
+/* Card with a floating glass effect */
+.card {
+  width: 100%;
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 15px;
+  gap: 20px;
+  overflow: hidden; /* Important for Framer Motion height animations */
 }
 
-h2 {
+/* Header & Status Dot */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-main);
   margin: 0;
 }
 
-.result-card {
-  width: 100%;
-  padding: 16px;
+.badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.badge.scam { background: #ffebeb; color: var(--accent-scam); }
+.badge.legit { background: #e8f9ee; color: var(--accent-safe); }
+.badge.neutral { background: #f2f2f7; color: var(--text-muted); }
+
+/* Confidence Section - Polished */
+.confidence-section {
+  background: #fbfbfd;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid #f2f2f7;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.label-row span:first-child {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.percentage-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e5e5ea;
   border-radius: 10px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  transition: 0.3s ease;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.scam {
-  background: #ffe5e5;
-  color: #b30000;
+.progress {
+  height: 100%;
+  border-radius: 10px;
+  /* Faster, springier transition */
+  transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1);
 }
 
-.legit {
-  background: #e6ffe6;
-  color: #006600;
+.progress.scam { background: var(--accent-scam); box-shadow: 0 0 10px rgba(255, 59, 48, 0.3); }
+.progress.legit { background: var(--accent-safe); box-shadow: 0 0 10px rgba(52, 199, 89, 0.3); }
+
+/* Explanation/Tags */
+.explanation-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
 }
-.explanation {
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: white;
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #48484a;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+/* Icons & Micro-Animations */
+.shield-icon {
+  font-size: 22px;
+  display: inline-block;
+}
+
+/* Standard Pulse for Loading State */
+.pulse {
+  animation: pulse-simple 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-simple {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Action Button */
+.action-btn {
   width: 100%;
-  font-size: 13px;
-  background: #ffffff;
-  border-radius: 8px;
-  padding: 8px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: var(--text-main);
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 4px;
+}
+.secondary-btn {
+  width: 100%;
+  padding: 10px;
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
 }
 
-.explanation ul {
-  margin: 5px 0 0 15px;
-  padding: 0;
+/* Add a glowing border to the card when a SCAM is found */
+.card.scam-detected {
+  border: 1.5px solid rgba(255, 59, 48, 0.3);
+  box-shadow: 0 10px 40px rgba(255, 59, 48, 0.1);
+}
+
+/* Tooltip for the confidence score */
+.percentage-text::after {
+  content: 'ⓘ';
+  font-size: 10px;
+  margin-left: 4px;
+  color: var(--text-muted);
+  cursor: help;
 }
