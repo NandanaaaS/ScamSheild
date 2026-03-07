@@ -1,3 +1,4 @@
+from lime.lime_text import LimeTextExplainer
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -36,6 +37,7 @@ class PredictRequest(BaseModel):
 class PredictResponse(BaseModel):
     prediction: str
     confidence: float
+    explanation: list[str]
 
 
 # ------------------------
@@ -53,7 +55,8 @@ async def predict_text(request: PredictRequest):
 
         return PredictResponse(
             prediction=result["prediction"],
-            confidence=result["confidence"]
+            confidence=result["confidence"],
+            explanation=result["explanation"]
         )
 
     except Exception as e:
@@ -87,7 +90,8 @@ async def predict_qr(file: UploadFile = File(...)):
 
         return PredictResponse(
             prediction=result["prediction"],
-            confidence=result["confidence"]
+            confidence=result["confidence"],
+            explanation=result["explanation"]
         )
 
     except Exception as e:

@@ -39,3 +39,16 @@ h2 {
   background: #e6ffe6;
   color: #006600;
 }
+.explanation {
+  width: 100%;
+  font-size: 13px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.08);
+}
+
+.explanation ul {
+  margin: 5px 0 0 15px;
+  padding: 0;
+}
