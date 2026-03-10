@@ -1,121 +1,70 @@
-import React from "react";
+import React, { useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
-function QRScan({
-  qrModalOpen,
-  setQrModalOpen,
-  qrFile,
-  setQrFile,
-  loading,
-  analyzeQr,
-}) {
+function QRScan({ qrModalOpen, setQrModalOpen, qrFile, setQrFile, loading, analyzeQr }) {
+  const fileInputRef = useRef(null);
+
   return (
-    <div className="input-section" style={{ marginBottom: 24 }}>
-      <button
-        className="action-btn"
-        style={{
-          width: "100%",
-          padding: 14,
-          borderRadius: 16,
-          fontWeight: 700,
-          fontSize: 15,
-          background: "#1d1d1f",
-          color: "#fff",
-          border: "none",
-          marginTop: 4,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-        }}
-        onClick={() => setQrModalOpen(true)}
-      >
+    <div className="input-section">
+      <button className="btn btn-primary" onClick={() => setQrModalOpen(true)}>
         Upload QR Image
       </button>
-      {qrModalOpen && (
-        <div
-          className="modal-bg"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.12)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 100,
-          }}
-        >
-          <div
-            className="modal"
-            style={{
-              background: "#fff",
-              borderRadius: 24,
-              boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
-              padding: 32,
-              minWidth: 320,
-              maxWidth: 400,
-              display: "flex",
-              flexDirection: "column",
-              gap: 18,
-            }}
+
+      <AnimatePresence>
+        {qrModalOpen && (
+          <motion.div
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
           >
-            <h3
-              style={{
-                fontWeight: 700,
-                fontSize: 18,
-                color: "#1d1d1f",
-                marginBottom: 12,
-              }}
+            <motion.div
+              className="modal"
+              initial={{ opacity: 0, y: 16, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.97 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
             >
-              Scan QR Code
-            </h3>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setQrFile(e.target.files[0])}
-              style={{ marginBottom: 16 }}
-            />
-            <button
-              className="action-btn"
-              style={{
-                width: "100%",
-                padding: 14,
-                borderRadius: 16,
-                fontWeight: 700,
-                fontSize: 15,
-                background: "#1d1d1f",
-                color: "#fff",
-                border: "none",
-                marginTop: 4,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-              }}
-              disabled={!qrFile || loading}
-              onClick={() => qrFile && analyzeQr(qrFile)}
-            >
-              Scan & Analyze
-            </button>
-            <button
-              className="secondary-btn"
-              style={{
-                width: "100%",
-                padding: 12,
-                borderRadius: 16,
-                fontWeight: 600,
-                fontSize: 14,
-                background: "#fff",
-                color: "#86868b",
-                border: "1px solid #e5e5e7",
-                marginTop: 8,
-              }}
-              onClick={() => {
-                setQrModalOpen(false);
-                setQrFile(null);
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+              <p className="modal-title">Scan QR Code</p>
+
+              <div
+                className="file-input-area"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <label className="file-input-label">
+                  <span className="upload-icon">📷</span>
+                  {qrFile
+                    ? <span className="file-name">{qrFile.name}</span>
+                    : <span>Click to choose a QR image</span>
+                  }
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setQrFile(e.target.files[0])}
+                  />
+                </label>
+              </div>
+
+              <button
+                className="btn btn-primary"
+                disabled={!qrFile || loading}
+                onClick={() => qrFile && analyzeQr(qrFile)}
+              >
+                {loading ? "Scanning…" : "Scan & Analyze"}
+              </button>
+
+              <button
+                className="btn btn-ghost"
+                onClick={() => { setQrModalOpen(false); setQrFile(null); }}
+              >
+                Cancel
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

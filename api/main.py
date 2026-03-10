@@ -76,53 +76,50 @@ async def predict_text(request: PredictRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# ----------------------------
+# Google Safe Browsing Helper
+# ----------------------------
+def google_safe_browsing_check(url):
+    api_key = os.getenv("GOOGLE_SAFE_BROWSING_API_KEY")
+    endpoint = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={api_key}"
+    payload = {
+        "client": {"clientId": "scamshield", "clientVersion": "1.0"},
+        "threatInfo": {
+            "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],
+            "platformTypes": ["ANY_PLATFORM"],
+            "threatEntryTypes": ["URL"],
+            "threatEntries": [{"url": url}]
+        }
+    }
+    logging.info(f"Calling Google Safe Browsing API for URL: {url}")
+    try:
+        resp = requests.post(endpoint, json=payload, timeout=5)
+        logging.info(f"Google Safe Browsing response status: {resp.status_code}")
+        logging.info(f"Google Safe Browsing response body: {resp.text}")
+        resp.raise_for_status()
+        data = resp.json()
+        if "matches" in data:
+            return "Unsafe: Threat detected by Google Safe Browsing"
+        else:
+            return "Safe: No threats found by Google Safe Browsing"
+    except Exception as e:
+        logging.error(f"Safe Browsing check error: {str(e)}")
+        return f"Safe Browsing check error: {str(e)}"
 
+# ------------------------
+# URL CHECK ENDPOINT
+# ------------------------
+
+@app.post("/url-check", response_model=URLCheckResponse)
+async def url_check(request: URLCheckRequest):
+    verdict = google_safe_browsing_check(request.url)
+    return URLCheckResponse(risks=[verdict])
 # ------------------------
 # QR PREDICTION
 # ------------------------
 
 @app.post("/predict-qr", response_model=PredictResponse)
 async def predict_qr(file: UploadFile = File(...)):
-    import logging
-    def google_safe_browsing_check(url):
-        api_key = os.getenv("GOOGLE_SAFE_BROWSING_API_KEY")
-        endpoint = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={api_key}"
-        payload = {
-            "client": {"clientId": "scamshield", "clientVersion": "1.0"},
-            "threatInfo": {
-                "threatTypes": ["MALWARE", "SOCIAL_ENGINEERING", "UNWANTED_SOFTWARE", "POTENTIALLY_HARMFUL_APPLICATION"],
-                "platformTypes": ["ANY_PLATFORM"],
-                "threatEntryTypes": ["URL"],
-                "threatEntries": [{"url": url}]
-            }
-        }
-        logging.info(f"Calling Google Safe Browsing API for URL: {url}")
-        try:
-            resp = requests.post(endpoint, json=payload, timeout=5)
-            logging.info(f"Google Safe Browsing response status: {resp.status_code}")
-            logging.info(f"Google Safe Browsing response body: {resp.text}")
-            resp.raise_for_status()
-            data = resp.json()
-            if "matches" in data:
-                return "Unsafe: Threat detected by Google Safe Browsing"
-            else:
-                return "Safe: No threats found by Google Safe Browsing"
-        except Exception as e:
-            logging.error(f"Safe Browsing check error: {str(e)}")
-            return f"Safe Browsing check error: {str(e)}"
-
-    # ------------------------
-    # URL CHECK ENDPOINT
-    # ------------------------
-
-    @app.post("/url-check", response_model=URLCheckResponse)
-    async def url_check(request: URLCheckRequest):
-        url = request.url
-        risks = []
-        verdict = google_safe_browsing_check(url)
-        risks.append(verdict)
-        return URLCheckResponse(risks=risks)
-
     try:
         temp_path = "temp_qr.png"
         with open(temp_path, "wb") as buffer:
