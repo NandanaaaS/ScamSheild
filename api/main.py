@@ -1,4 +1,5 @@
 from lime.lime_text import LimeTextExplainer
+from src.models.voice import predict_audio
 import logging
 logging.basicConfig(level=logging.INFO)
 from fastapi import FastAPI, HTTPException, UploadFile, File
@@ -149,5 +150,25 @@ async def predict_qr(file: UploadFile = File(...)):
             explanation=explanation,
             url_risks=url_risks
         )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+### AUDIO 
+
+@app.post("/predict-audio")
+async def predict_audio_api(file: UploadFile = File(...)):
+
+    try:
+        temp_path = "temp_audio.wav"
+
+        with open(temp_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        result = predict_audio(temp_path)
+
+        os.remove(temp_path)
+
+        return result
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
